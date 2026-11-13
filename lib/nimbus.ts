@@ -122,7 +122,11 @@ function query(params: Record<string, string | number | boolean | undefined>): s
 }
 
 export const api = {
-  health: () => request<HealthResponse>("/healthz", { anonymous: true }),
+  health: () =>
+    request<HealthResponse>("/healthz", {
+      anonymous: true,
+      signal: AbortSignal.timeout(3000),
+    }),
 
   listTickets: (params: {
     status?: string;
