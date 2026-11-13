@@ -103,7 +103,7 @@ export function TicketTable({
                   rows.current[index] = node;
                 }}
                 tabIndex={0}
-                className="cursor-pointer focus-visible:bg-muted/60 focus-visible:outline-none"
+                className="cursor-pointer focus-visible:bg-muted/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/40 focus-visible:outline-none"
                 onClick={() => onOpen(ticket.id)}
                 onKeyDown={(event) => handleKey(event, index, ticket.id)}
                 aria-label={`Open ticket ${shortId(ticket.id)}`}

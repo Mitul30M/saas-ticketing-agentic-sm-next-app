@@ -39,10 +39,12 @@ export function SidebarNav({ approvalsBadge }: { approvalsBadge?: ReactNode }) {
         <SidebarMenu>
           {NAV_ITEMS.map((item) => {
             const Icon = ICONS[item.href] ?? LayoutDashboardIcon;
+            const active = isNavActive(item.href, item.exact, pathname);
             return (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
-                  isActive={isNavActive(item.href, item.exact, pathname)}
+                  isActive={active}
+                  aria-current={active ? "page" : undefined}
                   tooltip={item.label}
                   render={<Link href={item.href} />}
                 >

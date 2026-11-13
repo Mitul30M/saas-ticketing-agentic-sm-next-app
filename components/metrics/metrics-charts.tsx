@@ -57,7 +57,7 @@ export function StatusChartCard({ data }: { data: StatusChartDatum[] }) {
                   tick={{ fontSize: 10 }}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="count" fill="var(--color-count)" radius={4} />
+                <Bar dataKey="count" fill="var(--color-count)" radius={4} isAnimationActive={false} />
               </BarChart>
             </ChartContainer>
             <figcaption className="sr-only">
@@ -98,7 +98,7 @@ export function EscalationChartCard({ data }: { data: EscalationChartDatum[] }) 
                   tick={{ fontSize: 10 }}
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="count" fill="var(--color-count)" radius={4} />
+                <Bar dataKey="count" fill="var(--color-count)" radius={4} isAnimationActive={false} />
               </BarChart>
             </ChartContainer>
             <figcaption className="sr-only">
@@ -151,8 +151,8 @@ export function NodeLatencyChartCard({
                 />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <ChartLegend content={<ChartLegendContent />} />
-                <Bar dataKey="avg" fill="var(--color-avg)" radius={4} />
-                <Bar dataKey="p95" fill="var(--color-p95)" radius={4} />
+                <Bar dataKey="avg" fill="var(--color-avg)" radius={4} isAnimationActive={false} />
+                <Bar dataKey="p95" fill="var(--color-p95)" radius={4} isAnimationActive={false} />
               </BarChart>
             </ChartContainer>
             <figcaption className="sr-only">

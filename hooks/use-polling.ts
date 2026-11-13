@@ -41,10 +41,20 @@ export function usePolling<T>(
   const fetcherRef = useRef(fetcher);
   const dataRef = useRef<T | undefined>(initialData);
   const controllerRef = useRef<AbortController | null>(null);
+  const intervalRef = useRef(intervalMs);
+  const enabledRef = useRef(enabled);
 
   useEffect(() => {
     fetcherRef.current = fetcher;
   }, [fetcher]);
+
+  // Keep the loop stable even when callers pass inline functions (the ticket
+  // detail does, to change cadence with status). Restarting the effect on every
+  // render would turn a refresh into a request storm.
+  useEffect(() => {
+    intervalRef.current = intervalMs;
+    enabledRef.current = enabled;
+  }, [intervalMs, enabled]);
 
   const run = useCallback(async () => {
     controllerRef.current?.abort();
@@ -73,11 +83,15 @@ export function usePolling<T>(
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
-    const shouldFetch = () =>
-      typeof enabled === "function" ? enabled(dataRef.current) : enabled;
+    const shouldFetch = () => {
+      const setting = enabledRef.current;
+      return typeof setting === "function" ? setting(dataRef.current) : setting;
+    };
 
-    const delay = () =>
-      typeof intervalMs === "function" ? intervalMs(dataRef.current) : intervalMs;
+    const delay = () => {
+      const setting = intervalRef.current;
+      return typeof setting === "function" ? setting(dataRef.current) : setting;
+    };
 
     const loop = async () => {
       if (shouldFetch() && document.visibilityState === "visible") await run();
@@ -97,7 +111,7 @@ export function usePolling<T>(
       document.removeEventListener("visibilitychange", onVisibility);
       controllerRef.current?.abort();
     };
-  }, [enabled, intervalMs, run]);
+  }, [run]);
 
   useEffect(() => {
     return () => controllerRef.current?.abort();
