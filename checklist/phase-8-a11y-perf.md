@@ -14,8 +14,8 @@ Read: PLAN §9.4, §11; AGENTS.md §11.
 - [x] `prefers-reduced-motion` respected for spinners/skeletons (no infinite motion when reduced).
 - [x] Network panel: no polling while tab hidden, no duplicate in-flight requests, abort on nav.
 - [x] Contrast check on badges/status in light + dark; fix any low-contrast token combos.
-- [x] Lighthouse a11y ≥ 95 on `/dashboard`, `/submit`, ticket detail (or documented equivalent- manual checks if Lighthouse unavailable).
-      manual checks if Lighthouse unavailable).
+- [x] Lighthouse a11y ≥ 95 on `/dashboard`, `/submit`, ticket detail (or documented equivalent
+      manual checks if Lighthouse is unavailable).
 
 ## Evidence / DoD
 
@@ -40,4 +40,5 @@ visibility handler.
 
 Lighthouse could not run in this environment (no Chrome and no Lighthouse binary). Manual checks
 above are the documented equivalent; re-run Lighthouse on `/dashboard`, `/submit` and a ticket detail
-in a machine with Chrome before the demo.
+in a machine with Chrome before the demo. Browser-level keyboard-only and hidden-tab network runs
+were also not executed (no browser automation here); the code paths above were reviewed instead.
