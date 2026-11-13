@@ -27,7 +27,7 @@ server-side route handlers; no backend or database code lives here.
 | `/dashboard/kb` | Operator | Browse and full-text search the knowledge base |
 | `/dashboard/settings` | Operator | Backend host, token presence, health, operator label, known limits |
 
-A screenshot set is intentionally not committed; `docs/DEMO_SCRIPT.md` is the reproducible walkthrough.
+A screenshot set is intentionally not committed; [`DOCS/DEMO.md`](DOCS/DEMO.md) is the reproducible walkthrough.
 
 ## Trust boundary
 
@@ -161,7 +161,7 @@ baked, there are no `NEXT_PUBLIC_*` values), and the image does not need the API
 
 - `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm test` pass.
 - Manual matrix results, including the backend-down check, are recorded in
-  [`docs/MANUAL_MATRIX.md`](docs/MANUAL_MATRIX.md).
+  [`DOCS/VERIFY.md`](DOCS/VERIFY.md).
 - The build checklist lives in [`checklist/`](checklist/README.md).
 
 ## Backend references
@@ -169,4 +169,4 @@ baked, there are no `NEXT_PUBLIC_*` values), and the image does not need the API
 - Route contract: [`../saas-ticketing-agentic-sm-backend/plans/frontend-api-guide.MD`](../saas-ticketing-agentic-sm-backend/plans/frontend-api-guide.MD)
 - Operational runbook: [`../saas-ticketing-agentic-sm-backend/docs/VERIFY.md`](../saas-ticketing-agentic-sm-backend/docs/VERIFY.md)
 - Published eval: [`../saas-ticketing-agentic-sm-backend/docs/EVAL_RESULTS.md`](../saas-ticketing-agentic-sm-backend/docs/EVAL_RESULTS.md)
-- Backend primer: [`../saas-ticketing-agentic-sm-backend/plans/backend-guide.MD`](../saas-ticketing-agentic-sm-backend/plans/backend-guide.MD)
+- Backend primer: [`plans/backend-guide.MD`](plans/backend-guide.MD) (the frontend repo's copy)

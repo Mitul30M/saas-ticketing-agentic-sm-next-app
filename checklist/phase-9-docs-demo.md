@@ -7,7 +7,7 @@ Read: PLAN §14, §15; backend `docs/VERIFY.md`.
 - [x] `README.md`: what it is, architecture/trust boundary, env vars, run commands, screen map,
       known limits (demo auth, polling not SSE, no total count, no approvals history, no ticket
       mutations, eval lives in backend).
-- [x] `docs/DEMO_SCRIPT.md`: 3–5 minute path — submit → list → detail (citations, trace) →
+- [x] `DOCS/DEMO.md`: 3–5 minute path — submit → list → detail (citations, trace) →
       approvals (evidence → approve) → safe paths (not-in-KB, injection) → metrics.
 - [x] Cross-links to backend `docs/VERIFY.md`, `docs/EVAL_RESULTS.md`, `plans/backend-guide.MD`.
 - [x] `.env.local.example` finalised; no secrets committed.
@@ -29,7 +29,7 @@ Read: PLAN §14, §15; backend `docs/VERIFY.md`.
 ## Runtime note (2026-11-13)
 
 `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm build` and `pnpm test` pass. Manual matrix rows 1–9 are
-recorded in `docs/MANUAL_MATRIX.md`; row 9 was exercised by stopping the API container and reloading
+recorded in `DOCS/VERIFY.md`; row 9 was exercised by stopping the API container and reloading
 `/dashboard` (friendly 503 banner, Settings `unavailable`, `/submit` still 200), then restarting it.
 Security greps: no token in `.next/static`, no `NEXT_PUBLIC_AGENT_TOKEN`, no `dangerouslySetInnerHTML`
 outside the generated chart style, no `middleware.ts`, no `pages/`, no `getServerSideProps`.
