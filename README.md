@@ -88,6 +88,34 @@ pnpm build            # production build (catches RSC/caching mistakes)
 pnpm test             # vitest: pure helpers only
 ```
 
+## Run with Docker
+
+`Dockerfile` builds a production image and `../saas-ticketing-agentic-sm-backend/docker-compose.yml`
+mounts it as the optional `web` service (a compose **profile**, so the backend still runs without
+this repo). From the backend repo:
+
+```bash
+AGENT_TOKEN=demo-token docker compose --profile web up -d --build
+# or: AGENT_TOKEN=demo-token make up-web
+```
+
+Then seed the backend once (`make migrate seed ingest-kb` in that repo) and open
+<http://localhost:3000>.
+
+Standalone image (bring your own backend URL):
+
+```bash
+docker build -t nimbus-console .
+docker run --rm -p 3000:3000 \
+  -e NIMBUS_API_URL=http://host.docker.internal:8000 \
+  -e AGENT_TOKEN=demo-token \
+  nimbus-console
+```
+
+Two build facts worth knowing: `NIMBUS_API_URL` and `AGENT_TOKEN` are **runtime** env (nothing is
+baked, there are no `NEXT_PUBLIC_*` values), and the image does not need the API during `next build`
+— request-time data sits behind Suspense boundaries, so `docker build` works with the backend down.
+
 ## How the data layer works
 
 - `app/` is routing only. Feature components live in `components/<domain>/`; generated shadcn

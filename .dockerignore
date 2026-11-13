@@ -1,0 +1,23 @@
+# Build context hygiene. The image installs dependencies itself, so the host
+# node_modules/.next are noise (and 1 GB+ of it).
+node_modules
+.next
+out
+build
+coverage
+.git
+.gitignore
+*.log
+*.tsbuildinfo
+next-env.d.ts
+
+# Never bake local configuration or secrets. Compose supplies these at runtime.
+.env
+.env.*
+.env.local.example
+!.env.example
+
+Dockerfile
+.dockerignore
+README.md
+plans
