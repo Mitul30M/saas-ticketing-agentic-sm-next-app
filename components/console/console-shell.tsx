@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { CircleDotIcon } from "lucide-react";
 import { ConsoleBreadcrumb } from "@/components/console/console-breadcrumb";
 import { SidebarNav } from "@/components/console/sidebar-nav";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Separator } from "@/components/ui/separator";
 import {
   Sidebar,
@@ -85,7 +86,10 @@ export function ConsoleShell({
           <Suspense fallback={<Skeleton className="h-4 w-20" />}>
             <ConsoleBreadcrumb />
           </Suspense>
-          <div className="ml-auto flex items-center gap-2">{operatorSlot}</div>
+          <div className="ml-auto flex items-center gap-1.5">
+            <ModeToggle />
+            {operatorSlot}
+          </div>
         </header>
         <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">{children}</div>
       </SidebarInset>

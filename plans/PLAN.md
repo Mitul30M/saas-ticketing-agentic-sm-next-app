@@ -125,7 +125,8 @@ Rules:
 - The preset is **Base UI based** (`@base-ui/react`), not Radix. Do not install Radix packages or
   copy snippets written for a Radix preset.
 - No second UI library, no CSS-in-JS, no component library from npm, no custom theme layer.
-- Dark mode is defined in `globals.css`; do not build a theme switcher unless P8 has time.
+- Dark mode is defined in `globals.css`. The light/dark toggle uses `next-themes` and only flips the
+  `.dark` class on `<html>`; the palette still comes from this file (no second theme layer).
 
 Already installed (use before adding): accordion, alert, alert-dialog, aspect-ratio, attachment,
 avatar, badge, breadcrumb, bubble, button, button-group, calendar, card, carousel, chart, checkbox,
@@ -146,10 +147,13 @@ suppressed globally:
   shadcn-generated (the carousel calls an Embla callback inside an effect) and are rewritten by the
   CLI. Do not remove the override; do not hand-edit generated components.
 
-### 2.4 One approved dependency
-KB article bodies are Markdown and must be rendered safely. Add **`react-markdown` +
-`remark-gfm`** (no `rehype-raw`, so HTML in content is never executed). Anything else new needs a
-note in this file first.
+### 2.4 Approved additions
+- KB article bodies are Markdown and must be rendered safely. Add **`react-markdown` +
+  `remark-gfm`** (no `rehype-raw`, so HTML in content is never executed).
+- **`next-themes`** for the light/dark toggle. It only manages the `.dark` class on `<html>`; the
+  palette still comes from `app/globals.css`, with no second theme layer.
+
+Anything else new needs a note in this file first.
 
 ---
 

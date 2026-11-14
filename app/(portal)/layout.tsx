@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CircleDotIcon, ShieldCheckIcon } from "lucide-react";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function PortalLayout({ children }: LayoutProps<"/">) {
   return (
@@ -12,13 +13,16 @@ export default function PortalLayout({ children }: LayoutProps<"/">) {
             </span>
             <span>Nimbus</span>
           </Link>
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ShieldCheckIcon aria-hidden className="size-3.5" />
-            Agent console
-          </Link>
+          <div className="flex items-center gap-1.5">
+            <ModeToggle />
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ShieldCheckIcon aria-hidden className="size-3.5" />
+              Agent console
+            </Link>
+          </div>
         </div>
       </header>
       <main className="flex flex-1 flex-col">{children}</main>

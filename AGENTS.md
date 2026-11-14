@@ -64,8 +64,8 @@ raise**, not a file to edit.
 - shadcn CLI 4.23 with **preset `base-mira`, baseColor `olive`** — the applied theme. **Use that
   only** (§3).
 - `lucide-react` icons, `recharts` (via `components/ui/chart.tsx`), `date-fns`.
-- pnpm. No new runtime dependency without a note in `plans/PLAN.md` (the one approved addition is
-  `react-markdown` + `remark-gfm` for KB bodies).
+- pnpm. No new runtime dependency without a note in `plans/PLAN.md` (approved additions:
+  `react-markdown` + `remark-gfm` for KB bodies, and `next-themes` for the theme toggle).
 
 ## 2. Next.js 16 rules that will bite you
 
