@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangleIcon, InboxIcon } from "lucide-react";
+import { AlertTriangleIcon, InboxIcon, InfoIcon } from "lucide-react";
 import { ApprovalCard } from "@/components/approvals/approval-card";
 import { BackendBanner } from "@/components/system/backend-banner";
 import { CitationSheet } from "@/components/tickets/citation-sheet";
@@ -25,11 +25,13 @@ import {
   approvalKey,
   filterApprovals,
   groupApprovals,
+  groupDecisionSummary,
   isApprovalFilter,
   type ApprovalFilter,
 } from "@/lib/approvals";
 import type { PendingApprovalsResponse } from "@/lib/api-types";
 import { apiFailure, clientGet } from "@/lib/client-api";
+import { approvalKind } from "@/lib/status";
 
 export function ApprovalInbox({ initial }: { initial: PendingApprovalsResponse }) {
   const router = useRouter();
@@ -157,29 +159,50 @@ export function ApprovalInbox({ initial }: { initial: PendingApprovalsResponse }
         </Empty>
       ) : (
         <div className="flex flex-col gap-8">
-          {groups.map((group) => (
-            <section
-              key={group.ticketId}
-              id={`ticket-${group.ticketId}`}
-              className="flex scroll-mt-20 flex-col gap-3"
-              aria-label={`Pending approvals for ${group.subject}`}
-            >
-              <div className="flex items-center justify-between gap-2 border-b pb-2">
-                <h2 className="min-w-0 truncate text-sm font-medium">{group.subject}</h2>
-                <Badge variant="outline">
-                  {group.items.length} pending
-                </Badge>
-              </div>
-              {group.items.map((item) => (
-                <ApprovalCard
-                  key={approvalKey(item)}
-                  item={item}
-                  onCitation={setCitation}
-                  onDecided={onDecided}
-                />
-              ))}
-            </section>
-          ))}
+          {groups.map((group) => {
+            const summary = groupDecisionSummary(group.items);
+            const actionLabels = summary.kinds
+              .filter((kind) => kind !== "send_reply")
+              .map((kind) => approvalKind(kind).label)
+              .join(" and ");
+
+            return (
+              <section
+                key={group.ticketId}
+                id={`ticket-${group.ticketId}`}
+                className="flex scroll-mt-20 flex-col gap-3"
+                aria-label={`Pending approvals for ${group.subject}`}
+              >
+                <div className="flex items-center justify-between gap-2 border-b pb-2">
+                  <h2 className="min-w-0 truncate text-sm font-medium">{group.subject}</h2>
+                  <Badge variant="outline">
+                    {group.items.length} pending
+                  </Badge>
+                </div>
+
+                {summary.hasAction && summary.hasReply && (
+                  <Alert>
+                    <InfoIcon aria-hidden />
+                    <AlertTitle>{summary.total} separate decisions</AlertTitle>
+                    <AlertDescription>
+                      {actionLabels} and Send reply are decided independently. If you reject the
+                      action, edit or reject the reply too — it may tell the customer the action is
+                      proposed.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {group.items.map((item) => (
+                  <ApprovalCard
+                    key={approvalKey(item)}
+                    item={item}
+                    onCitation={setCitation}
+                    onDecided={onDecided}
+                  />
+                ))}
+              </section>
+            );
+          })}
         </div>
       )}
 

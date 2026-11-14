@@ -38,6 +38,32 @@ import type { DecisionSubmit, SubmitResult } from "./types";
 
 type ActiveAction = "approve" | "edit" | "reject" | null;
 
+function CustomerReplyBlock({
+  item,
+  onCitation,
+  label = "Customer reply (proposed)",
+  note,
+}: {
+  item: PendingApproval;
+  onCitation: (kbId: string) => void;
+  label?: string;
+  note?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-[0.625rem] uppercase tracking-wide text-muted-foreground">{label}</p>
+      <div className="rounded-md border bg-muted/30 p-3">
+        {item.draft_reply ? (
+          <DraftText text={item.draft_reply} onCitation={onCitation} />
+        ) : (
+          <p className="text-xs text-muted-foreground">No reply draft was recorded.</p>
+        )}
+      </div>
+      {note && <p className="text-xs text-muted-foreground">{note}</p>}
+    </div>
+  );
+}
+
 function ActionBlock({
   item,
   onCitation,
@@ -47,49 +73,52 @@ function ActionBlock({
 }) {
   if (item.kind === "refund") {
     return (
-      <div className="rounded-md border bg-muted/30 p-3">
-        <p className="text-[0.625rem] uppercase tracking-wide text-muted-foreground">
-          Refund amount
-        </p>
-        <p className="font-mono text-lg font-medium">{money(item.amount_cents)}</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Invoice <Kbd className="ml-1 font-mono">{item.invoice_id ?? "—"}</Kbd>
-        </p>
+      <div className="flex flex-col gap-3">
+        <div className="rounded-md border bg-muted/30 p-3">
+          <p className="text-[0.625rem] uppercase tracking-wide text-muted-foreground">
+            Refund amount
+          </p>
+          <p className="font-mono text-lg font-medium">{money(item.amount_cents)}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Invoice <Kbd className="ml-1 font-mono">{item.invoice_id ?? "—"}</Kbd>
+          </p>
+        </div>
+        <CustomerReplyBlock
+          item={item}
+          onCitation={onCitation}
+          note="Approving the refund does not send this text. The reply is a separate decision."
+        />
       </div>
     );
   }
 
   if (item.kind === "plan_change") {
     return (
-      <div className="rounded-md border bg-muted/30 p-3">
-        <p className="text-[0.625rem] uppercase tracking-wide text-muted-foreground">
-          Plan change
-        </p>
-        <div className="mt-1 flex flex-wrap items-center gap-1.5 font-mono text-sm">
-          <span>{item.from_plan_id ?? "current"}</span>
-          <ArrowRightIcon aria-hidden className="size-3.5 text-muted-foreground" />
-          <span className="font-medium">{item.to_plan_id ?? "—"}</span>
+      <div className="flex flex-col gap-3">
+        <div className="rounded-md border bg-muted/30 p-3">
+          <p className="text-[0.625rem] uppercase tracking-wide text-muted-foreground">
+            Plan change
+          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-1.5 font-mono text-sm">
+            <span>{item.from_plan_id ?? "current"}</span>
+            <ArrowRightIcon aria-hidden className="size-3.5 text-muted-foreground" />
+            <span className="font-medium">{item.to_plan_id ?? "—"}</span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Effective: {item.effective ? planEffectiveLabel[item.effective] : "—"}
+          </p>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Effective: {item.effective ? planEffectiveLabel[item.effective] : "—"}
-        </p>
+        <CustomerReplyBlock
+          item={item}
+          onCitation={onCitation}
+          note="Approving the plan change does not send this text. The reply is a separate decision."
+        />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <p className="text-[0.625rem] uppercase tracking-wide text-muted-foreground">
-        Proposed reply
-      </p>
-      <div className="rounded-md border bg-muted/30 p-3">
-        {item.draft_reply ? (
-          <DraftText text={item.draft_reply} onCitation={onCitation} />
-        ) : (
-          <p className="text-xs text-muted-foreground">No draft text was returned.</p>
-        )}
-      </div>
-    </div>
+    <CustomerReplyBlock item={item} onCitation={onCitation} label="Proposed reply" />
   );
 }
 

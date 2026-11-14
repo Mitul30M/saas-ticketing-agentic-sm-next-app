@@ -330,12 +330,18 @@ the id visible and say "article unavailable".
 1. Kind badge + ticket subject + link to the ticket.
 2. **The action**: for `refund` → amount as currency + `invoice_id`; for `plan_change` →
    `from_plan_id → to_plan_id` + `effective`; for `send_reply` → the draft text with citation links.
+   - **Customer reply (proposed):** refund and plan-change cards also show `draft_reply` (with its
+     `[KB-xxx]` citation buttons) directly below the action. Label it clearly and state that
+     approving the action does not send the reply; it is a separate decision.
 3. **Evidence**: `evidence.kb_ids` as chips, other keys as key/value pairs.
 4. Flags / injection banner when present.
 5. Actions: **Approve**, **Edit** (dialog with a textarea prefilled with the draft; `edit` +
    `edited_text`), **Reject** (dialog with optional `note`).
 **Gate:** the Approve button is **disabled until 1–4 have rendered** (evidence must be on screen
 before the click). Never default it to enabled while data is loading.
+**Independent decisions:** when a ticket has both an action (refund / plan_change) and a reply
+pending, render a neutral notice above the cards: they are decided independently, and rejecting the
+action does not reject the reply. The reply may still tell the customer the action is proposed.
 **After submitting:** disable the card immediately, show `spinner`, then refetch pending + the
 ticket. `202` means recorded, not done.
 **Errors:** `409 "a final decision already exists"` / `"ticket is not waiting for a reply approval"` /
@@ -742,6 +748,8 @@ model, cost_usd, hit_count, last_hit_at, …)`, `schema_migrations`, and the Lan
 6. **No admin routes from the UI.** The proxy allow-list excludes `admin/*`.
 7. **Show what actually happened.** `sent_reply` is the truth for what a customer received; don't
    render the draft as if it was sent.
+8. **Actions and replies are separate decisions.** Show the reply text where the action is approved;
+   never imply one click sends both.
 
 ---
 
@@ -773,6 +781,8 @@ No DOM tests, no Playwright (time).
 | 7 | submit a quantum-fax ticket | `awaiting_human`, `LOW_CONFIDENCE`, no draft |
 | 8 | metrics page | tiles render, cost shows stub warning if tokens are 0 |
 | 9 | kill the backend, reload | friendly 503 banner, no crash |
+| 10 | approvals: action + reply pending | both cards show the reply draft; group notice "2 separate decisions"; approving the action does not send the reply |
+| 11 | reject the action, then approve the reply | the reply stays a separate, warned decision; the action is not executed |
 
 ---
 

@@ -1,4 +1,4 @@
-import type { PendingApproval } from "@/lib/api-types";
+import type { ApprovalKind, PendingApproval } from "@/lib/api-types";
 
 export const APPROVAL_FILTERS = [
   { value: "all", label: "All" },
@@ -57,6 +57,31 @@ export function groupApprovals(items: readonly PendingApproval[]): ApprovalGroup
 
 export function approvalKey(item: PendingApproval): string {
   return `${item.kind}:${item.ref}`;
+}
+
+export interface GroupDecisionSummary {
+  total: number;
+  kinds: ApprovalKind[]; // stable order: refund, plan_change, send_reply
+  hasAction: boolean; // refund or plan_change
+  hasReply: boolean; // send_reply
+}
+
+/**
+ * A ticket can carry an action (refund / plan change) and a reply as separate
+ * decisions. This summary lets the inbox warn before either Approve is clicked.
+ */
+export function groupDecisionSummary(
+  items: readonly PendingApproval[]
+): GroupDecisionSummary {
+  const kinds = (["refund", "plan_change", "send_reply"] as const).filter((kind) =>
+    items.some((item) => item.kind === kind)
+  );
+  return {
+    total: items.length,
+    kinds: [...kinds],
+    hasAction: kinds.includes("refund") || kinds.includes("plan_change"),
+    hasReply: kinds.includes("send_reply"),
+  };
 }
 
 export interface ApproveGate {

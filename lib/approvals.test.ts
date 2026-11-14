@@ -6,6 +6,7 @@ import {
   approveGate,
   filterApprovals,
   groupApprovals,
+  groupDecisionSummary,
   isApprovalFilter,
 } from "@/lib/approvals";
 
@@ -63,6 +64,59 @@ describe("groupApprovals", () => {
     expect(groups.map((group) => group.ticketId)).toEqual(["t2", "t1"]);
     expect(groups[0].items).toHaveLength(2);
     expect(approvalKey(groups[0].items[0])).toBe("refund:r1");
+  });
+});
+
+describe("groupDecisionSummary", () => {
+  it("returns an empty summary", () => {
+    expect(groupDecisionSummary([])).toEqual({
+      total: 0,
+      kinds: [],
+      hasAction: false,
+      hasReply: false,
+    });
+  });
+
+  it("detects a reply-only group", () => {
+    expect(groupDecisionSummary([approval({ kind: "send_reply" })])).toEqual({
+      total: 1,
+      kinds: ["send_reply"],
+      hasAction: false,
+      hasReply: true,
+    });
+  });
+
+  it("detects refund + reply and keeps stable kind order", () => {
+    const summary = groupDecisionSummary([
+      approval({ kind: "send_reply" }),
+      approval({ kind: "refund", ref: "r1" }),
+    ]);
+    expect(summary).toEqual({
+      total: 2,
+      kinds: ["refund", "send_reply"],
+      hasAction: true,
+      hasReply: true,
+    });
+  });
+
+  it("detects plan change + reply", () => {
+    const summary = groupDecisionSummary([
+      approval({ kind: "plan_change", ref: "p1" }),
+      approval({ kind: "send_reply" }),
+    ]);
+    expect(summary.hasAction).toBe(true);
+    expect(summary.hasReply).toBe(true);
+    expect(summary.kinds).toEqual(["plan_change", "send_reply"]);
+  });
+
+  it("counts cards in total while listing duplicate kinds once", () => {
+    const summary = groupDecisionSummary([
+      approval({ kind: "refund", ref: "r1" }),
+      approval({ kind: "refund", ref: "r2" }),
+      approval({ kind: "send_reply" }),
+    ]);
+    expect(summary.total).toBe(3);
+    expect(summary.kinds).toEqual(["refund", "send_reply"]);
   });
 });
 
