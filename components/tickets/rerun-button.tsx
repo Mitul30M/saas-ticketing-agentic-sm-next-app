@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import type { RerunResponse, TicketStatus } from "@/lib/api-types";
 import { apiFailure, clientPost } from "@/lib/client-api";
+import { rerunBlockReason } from "@/lib/status";
 
 export function RerunButton({
   ticketId,
@@ -31,12 +32,7 @@ export function RerunButton({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const blocked =
-    status === "new" || status === "triaging"
-      ? "The agent is already running on this ticket."
-      : status === "awaiting_approval"
-        ? "Decide the pending approval before re-running."
-        : null;
+  const blocked = rerunBlockReason(status);
 
   async function run() {
     if (pending || blocked) return;
@@ -52,7 +48,9 @@ export function RerunButton({
     } catch (cause) {
       const failure = apiFailure(cause);
       if (failure?.status === 409) {
-        setError("The ticket already has an active run. Wait for it to finish.");
+        setError(
+          "The ticket already has an active run. Wait for it to finish, then try again."
+        );
       } else if (failure?.status === 400) {
         setError("Your operator session was lost. Sign in again before re-running.");
       } else {

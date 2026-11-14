@@ -12,6 +12,7 @@ import {
   outcome,
   priority,
   queue,
+  rerunBlockReason,
   sentiment,
   ticketStatus,
 } from "@/lib/status";
@@ -70,6 +71,23 @@ describe("terminal state", () => {
     expect(isTerminalStatus("failed")).toBe(true);
     expect(isTerminalStatus("awaiting_human")).toBe(false);
     expect(isTerminalStatus("triaging")).toBe(false);
+  });
+});
+
+describe("re-run guard", () => {
+  it("allows a seeded `new` ticket with no job", () => {
+    expect(rerunBlockReason("new")).toBeNull();
+  });
+
+  it("blocks while a run is active or a decision is pending", () => {
+    expect(rerunBlockReason("triaging")).toContain("already running");
+    expect(rerunBlockReason("awaiting_approval")).toContain("pending approval");
+  });
+
+  it("allows terminal and human-parked states", () => {
+    expect(rerunBlockReason("resolved")).toBeNull();
+    expect(rerunBlockReason("failed")).toBeNull();
+    expect(rerunBlockReason("awaiting_human")).toBeNull();
   });
 });
 

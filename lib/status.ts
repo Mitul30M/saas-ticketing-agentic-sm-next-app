@@ -139,6 +139,19 @@ export function isTerminalStatus(status: TicketStatus): boolean {
   return status === "resolved" || status === "failed";
 }
 
+/**
+ * Re-run is blocked only when a run is active (`triaging`) or a decision is
+ * pending. `new` is deliberately allowed: seeded/imported tickets can sit in
+ * `new` with no job at all, and the backend accepts POST /run for them. A
+ * freshly submitted ticket that still has a queued job will answer 409, which
+ * the button surfaces. The backend is the source of truth for an active run.
+ */
+export function rerunBlockReason(status: TicketStatus): string | null {
+  if (status === "triaging") return "The agent is already running on this ticket.";
+  if (status === "awaiting_approval") return "Decide the pending approval before re-running.";
+  return null;
+}
+
 const ESCALATION_COPY: Record<string, string> = {
   LOW_CONFIDENCE: "The knowledge base doesn't cover this confidently",
   BAD_TICKET: "No verifiable sender or empty body",
