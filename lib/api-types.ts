@@ -107,6 +107,7 @@ export interface TraceEvent {
   kind: TraceKind;
   status: "ok" | "error";
   error: string | null;
+  error_detail: string | null; // tool's own sentence on a failed row
   duration_ms: number | null;
   tokens_in: number | null;
   tokens_out: number | null;

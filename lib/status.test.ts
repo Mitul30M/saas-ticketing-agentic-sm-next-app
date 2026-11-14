@@ -7,6 +7,7 @@ import {
   escalationCopy,
   flagCopy,
   handledBy,
+  isAmendedRefusalDraft,
   isTerminalStatus,
   outcome,
   priority,
@@ -69,5 +70,33 @@ describe("terminal state", () => {
     expect(isTerminalStatus("failed")).toBe(true);
     expect(isTerminalStatus("awaiting_human")).toBe(false);
     expect(isTerminalStatus("triaging")).toBe(false);
+  });
+});
+
+describe("amended refusal drafts", () => {
+  const refused = {
+    agent_outcome: "escalated",
+    escalation_reason: "business_rule",
+    draft_reply: "Refunds are available within 30 days [KB-006]. A specialist will follow up.",
+  };
+
+  it("is true for an escalated draft with a tool-level refusal reason", () => {
+    expect(isAmendedRefusalDraft(refused)).toBe(true);
+  });
+
+  it("is false for LOW_CONFIDENCE", () => {
+    expect(isAmendedRefusalDraft({ ...refused, escalation_reason: "LOW_CONFIDENCE" })).toBe(false);
+  });
+
+  it("is false when there is no draft", () => {
+    expect(isAmendedRefusalDraft({ ...refused, draft_reply: null })).toBe(false);
+  });
+
+  it("is false when the agent proposed an action instead of escalating", () => {
+    expect(isAmendedRefusalDraft({ ...refused, agent_outcome: "action_proposed" })).toBe(false);
+  });
+
+  it("is false when no escalation reason is present", () => {
+    expect(isAmendedRefusalDraft({ ...refused, escalation_reason: null })).toBe(false);
   });
 });

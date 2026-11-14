@@ -172,6 +172,32 @@ export function escalationCopy(reason: string | null | undefined): string | null
   return ESCALATION_COPY[reason] ?? null;
 }
 
+/** Tool-level reasons that mean "the action was attempted and refused". */
+export const REFUSAL_REASONS: ReadonlySet<string> = new Set([
+  "business_rule",
+  "ownership_mismatch",
+  "duplicate",
+  "invalid_input",
+  "not_found",
+  "timeout",
+  "internal",
+]);
+
+/** A draft shown on a refused action was amended by the backend; say so. */
+export function isAmendedRefusalDraft(ticket: {
+  agent_outcome: string | null;
+  escalation_reason: string | null;
+  draft_reply: string | null;
+}): boolean {
+  const reason = ticket.escalation_reason;
+  return (
+    ticket.agent_outcome === "escalated" &&
+    Boolean(ticket.draft_reply) &&
+    reason !== null &&
+    REFUSAL_REASONS.has(reason)
+  );
+}
+
 const FLAG_COPY: Record<string, string> = {
   instruction_override: "Asked to ignore prior instructions",
   system_prompt_marker: "Contained a fake system prompt marker",

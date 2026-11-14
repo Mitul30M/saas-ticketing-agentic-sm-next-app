@@ -38,3 +38,28 @@ export function traceTokens(event: TraceEvent): string | null {
   if (event.tokens_in === null && event.tokens_out === null) return null;
   return `${event.tokens_in ?? 0} in / ${event.tokens_out ?? 0} out`;
 }
+
+/** True when the row is a tool failure with a sentence to show. */
+export function hasToolErrorDetail(event: TraceEvent): boolean {
+  return (
+    event.kind === "tool" &&
+    event.status === "error" &&
+    typeof event.error_detail === "string" &&
+    event.error_detail.trim().length > 0
+  );
+}
+
+/** The latest failed row's sentence, or null. One run per trace_id → call per group. */
+export function latestToolErrorDetail(events: readonly TraceEvent[]): string | null {
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const event = events[index];
+    if (
+      event.status === "error" &&
+      typeof event.error_detail === "string" &&
+      event.error_detail.trim().length > 0
+    ) {
+      return event.error_detail;
+    }
+  }
+  return null;
+}

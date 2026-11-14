@@ -9,6 +9,7 @@ import { usePolling } from "@/hooks/use-polling";
 import type { Customer, TicketDetail, TraceResponse } from "@/lib/api-types";
 import { apiFailure, clientGet } from "@/lib/client-api";
 import { isTerminalStatus } from "@/lib/status";
+import { latestToolErrorDetail } from "@/lib/trace";
 import { ApprovalGatePanel } from "./approval-gate-panel";
 import { CitationSheet } from "./citation-sheet";
 import { DraftPanel } from "./draft-panel";
@@ -61,6 +62,7 @@ export function TicketDetailView({
 
   const snapshot = polling.data ?? { ticket: initialTicket, trace: initialTrace };
   const { ticket } = snapshot;
+  const toolDetail = latestToolErrorDetail(snapshot.trace.items);
   const failure = apiFailure(polling.error);
   const backendDown = failure?.status === 401 || failure?.status === 503;
   const stale = polling.failures >= 2;
@@ -119,7 +121,7 @@ export function TicketDetailView({
               suspected={ticket.injection_suspected}
               flags={ticket.flags}
             />
-            <EscalationCard ticket={ticket} />
+            <EscalationCard ticket={ticket} toolDetail={toolDetail} />
             <DraftPanel ticket={ticket} onCitation={setCitation} />
             <ProposedActions actions={ticket.proposed_actions} onCitation={setCitation} />
           </div>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileWarningIcon, QuoteIcon } from "lucide-react";
+import { FileWarningIcon, InfoIcon, QuoteIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { TicketDetail } from "@/lib/api-types";
+import { isAmendedRefusalDraft } from "@/lib/status";
 import { DraftText } from "./draft-text";
 
 export function DraftPanel({
@@ -24,6 +25,12 @@ export function DraftPanel({
 }) {
   const citations = ticket.draft_citations ?? [];
   const replyPending = ticket.status === "awaiting_approval" && Boolean(ticket.draft_reply);
+  const amendedRefusal = isAmendedRefusalDraft(ticket);
+  const draftBadge = amendedRefusal
+    ? "Draft amended — action declined"
+    : ticket.sent_reply
+      ? "Draft — superseded"
+      : "Not sent";
 
   return (
     <Card size="sm">
@@ -36,7 +43,7 @@ export function DraftPanel({
           A proposal only. The customer has not received this text.
         </CardDescription>
         <CardAction>
-          <Badge variant="outline">{ticket.sent_reply ? "Draft — superseded" : "Not sent"}</Badge>
+          <Badge variant="outline">{draftBadge}</Badge>
         </CardAction>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
@@ -46,6 +53,17 @@ export function DraftPanel({
             <AlertTitle>Not grounded in the knowledge base</AlertTitle>
             <AlertDescription>
               This draft exists even though grounding failed. Read it before acting.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {amendedRefusal && (
+          <Alert>
+            <InfoIcon />
+            <AlertTitle>No proposal was created</AlertTitle>
+            <AlertDescription>
+              This draft was written before the action was attempted and then amended. Nothing is
+              waiting for approval, and the customer has not received it.
             </AlertDescription>
           </Alert>
         )}

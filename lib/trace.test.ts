@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { TraceEvent } from "@/lib/api-types";
-import { groupTrace, traceTokens } from "@/lib/trace";
+import {
+  groupTrace,
+  hasToolErrorDetail,
+  latestToolErrorDetail,
+  traceTokens,
+} from "@/lib/trace";
 
 function event(overrides: Partial<TraceEvent>): TraceEvent {
   return {
@@ -9,6 +14,7 @@ function event(overrides: Partial<TraceEvent>): TraceEvent {
     kind: "llm",
     status: "ok",
     error: null,
+    error_detail: null,
     duration_ms: 10,
     tokens_in: 5,
     tokens_out: 7,
@@ -43,5 +49,58 @@ describe("traceTokens", () => {
   it("renders token counts only for LLM rows", () => {
     expect(traceTokens(event({}))).toBe("5 in / 7 out");
     expect(traceTokens(event({ tokens_in: null, tokens_out: null }))).toBeNull();
+  });
+});
+
+describe("tool error detail", () => {
+  it("returns the sentence from the latest failed row", () => {
+    const events = [
+      event({
+        kind: "tool",
+        status: "error",
+        error: "business_rule",
+        error_detail: "invoice is outside the 30-day refund window",
+      }),
+      event({ kind: "tool", status: "ok", error_detail: null }),
+      event({
+        kind: "tool",
+        status: "error",
+        error: "timeout",
+        error_detail: "the tool timed out",
+      }),
+    ];
+    expect(latestToolErrorDetail(events)).toBe("the tool timed out");
+  });
+
+  it("returns null when no row failed", () => {
+    expect(latestToolErrorDetail([event({}), event({ kind: "tool" })])).toBeNull();
+    expect(latestToolErrorDetail([])).toBeNull();
+  });
+
+  it("ignores a failure without a sentence", () => {
+    expect(
+      latestToolErrorDetail([
+        event({ kind: "tool", status: "error", error: "timeout", error_detail: null }),
+      ])
+    ).toBeNull();
+    expect(
+      latestToolErrorDetail([
+        event({ kind: "tool", status: "error", error: "timeout", error_detail: "   " }),
+      ])
+    ).toBeNull();
+  });
+
+  it("only calls a tool failure with a sentence a tool error detail", () => {
+    expect(
+      hasToolErrorDetail(
+        event({ kind: "tool", status: "error", error_detail: "a rule refused this" })
+      )
+    ).toBe(true);
+    expect(
+      hasToolErrorDetail(event({ kind: "node", status: "error", error_detail: "node failed" }))
+    ).toBe(false);
+    expect(hasToolErrorDetail(event({ kind: "tool", status: "ok", error_detail: "n/a" }))).toBe(
+      false
+    );
   });
 });

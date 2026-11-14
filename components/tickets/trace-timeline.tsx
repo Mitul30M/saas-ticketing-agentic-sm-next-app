@@ -50,6 +50,11 @@ function EventRow({ event }: { event: TraceEvent }) {
           {event.kind} · {formatDateTime(event.started_at)}
           {event.error ? ` · ${event.error}` : ""}
         </p>
+        {event.error_detail && (
+          <p className="mt-0.5 break-words text-[0.625rem] text-destructive/90">
+            {event.error_detail}
+          </p>
+        )}
       </div>
       <div className="flex shrink-0 items-center gap-2 text-[0.625rem] tabular-nums text-muted-foreground">
         <span>{duration(event.duration_ms)}</span>

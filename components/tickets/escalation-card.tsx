@@ -5,7 +5,13 @@ import { Kbd } from "@/components/ui/kbd";
 import type { TicketDetail } from "@/lib/api-types";
 import { escalationCopy } from "@/lib/status";
 
-export function EscalationCard({ ticket }: { ticket: TicketDetail }) {
+export function EscalationCard({
+  ticket,
+  toolDetail,
+}: {
+  ticket: TicketDetail;
+  toolDetail?: string | null;
+}) {
   if (!ticket.escalation_reason) return null;
   const friendly = escalationCopy(ticket.escalation_reason);
 
@@ -22,6 +28,11 @@ export function EscalationCard({ ticket }: { ticket: TicketDetail }) {
           <ShieldQuestionIcon aria-hidden className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
           {friendly ?? "The agent parked this ticket with an unrecognised reason code."}
         </p>
+        {toolDetail && (
+          <p className="text-xs text-muted-foreground">
+            <span className="font-medium text-foreground">Tool says:</span> {toolDetail}
+          </p>
+        )}
         <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
           <span>Raw code</span>
           <Kbd className="font-mono">{ticket.escalation_reason}</Kbd>
